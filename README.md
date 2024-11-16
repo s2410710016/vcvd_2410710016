@@ -1,5 +1,3 @@
 # vcvd_2410710016
 
-Test
-asdfasdfasdfasdf
-TEST TEST
+print ("hello world")
