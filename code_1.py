@@ -1,6 +1,10 @@
+#%%
+
 import scipy
 from scipy import constants
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 #input
 mass_vehicle=2000 #mass of vehicle in kilogram
@@ -65,7 +69,7 @@ Fx0=D_bf*math.sin(C_bf*math.atan(B_bf*phi_bf))
 print ("Fx0=",Fx0)
 
 #Sigma
-kappa=0.2
+kappa=2.3
 Sigma_x=-kappa/(1+kappa)
 Sigma_y=-math.tan(alpha)/(1+kappa)
 Sigma=math.sqrt(Sigma_x**2+Sigma_y**2)
@@ -80,11 +84,6 @@ Fy=-(Sigma_y/Sigma)*Fy0
 print ("Fx=",Fx)
 print ("Fy=",Fy)
 
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-x_test=np.linspace(0,1,100)
-y_test=3*x_test**2
-
-plt.plot(x_test, y_test)
+plt.plot(kappa, Fx)
+plt.show()
+# %%
