@@ -4,7 +4,8 @@ import math
 
 #input
 mass_vehicle=2000 #mass of vehicle in kilogram
-alpha=2 #slip angle in degree
+alpha_grad=2 #slip angle
+alpha=alpha_grad*math.pi/180 #slip angle in degree
 my=0.2 #friction coefficient
 
 #definitions
@@ -38,7 +39,9 @@ a12_Fx=0.022
 a13_Fx=0.0
 
 #General Calculations
-Fz=scipy.constants.g*mass_vehicle/4000 #load on tire in kilogramm
+Fz=scipy.constants.g*mass_vehicle/4000 #load on each tire in kilogramm
+
+print ("Fz=",Fz)
 
 #Side Force
 D_sf=a1_Fy*Fz**2+a2_Fy*Fz #peak factor
@@ -48,9 +51,9 @@ E_sf=a6_Fy*Fz**2+a7_Fy*Fz+a8_Fy
 delta_Sh=a9_Fy*camber
 delta_Sv=(a10_Fy*Fz**2+a11_Fy*Fz)*camber
 phi_sf=(1-E_sf)*(alpha+delta_Sh)+(E_sf/B_sf)*math.atan(B_sf*(alpha+delta_Sh))
-Fy=D_sf*math.sin(C_sf*math.atan(B_sf*phi_sf))+delta_Sv
+Fy0=D_sf*math.sin(C_sf*math.atan(B_sf*phi_sf))+delta_Sv
 
-print ("Fy=",Fy)
+print ("Fy0=",Fy0)
 
 #Brake Force
 D_bf=a1_Fx*Fz**2+a2_Fx*Fz #peak factor
@@ -58,5 +61,30 @@ C_bf=1.65
 B_bf=(a3_Fx*Fz**2+a4_Fx*Fz)/(C_bf*D_bf*math.e**(a5_Fx*Fz))
 E_bf=a6_Fx*Fz**2+a7_Fx*Fz+a8_Fx
 phi_bf=(1-E_bf)*alpha+(E_bf/B_bf)*math.atan(B_bf*alpha)
-Fx=D_bf*math.sin(C_bf*math.atan(B_bf*phi_bf))
+Fx0=D_bf*math.sin(C_bf*math.atan(B_bf*phi_bf))
+print ("Fx0=",Fx0)
+
+#Sigma
+kappa=0.2
+Sigma_x=-kappa/(1+kappa)
+Sigma_y=-math.tan(alpha)/(1+kappa)
+Sigma=math.sqrt(Sigma_x**2+Sigma_y**2)
+
+print ("Sigma_X",Sigma_x)
+print ("Sigma_Y",Sigma_y)
+
+#combined
+Fx=-(Sigma_x/Sigma)*Fx0
+Fy=-(Sigma_y/Sigma)*Fy0
+
 print ("Fx=",Fx)
+print ("Fy=",Fy)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x_test=np.linspace(0,1,100)
+y_test=3*x_test**2
+
+plt.plot(x_test, y_test)
