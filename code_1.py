@@ -41,9 +41,11 @@ a11_Fx=14.8
 a12_Fx=0.022
 a13_Fx=0.0
 
-#General Calculations
-Fz=scipy.constants.g*mass_vehicle/4000 #load on each tire in kilogramm
+kappa=np.linspace(0,1,100)
 
+#General Calculations
+#Fz=scipy.constants.g*mass_vehicle/4000 #load on each tire in kilogramm
+Fz=4
 print ("Fz=",round(Fz,2),"kN")
 
 #Side Force
@@ -55,12 +57,12 @@ delta_Sh=a9_Fy*camber #horizontal shift
 delta_Sv=(a10_Fy*Fz**2+a11_Fy*Fz)*camber #vertical shift
 
 def phi_sf(alpha):
-    return(1-E_sf)*(alpha+delta_Sh)+(E_sf/B_sf)*np.arctan(B_sf*(alpha+delta_Sh))
+    return(1-E_sf)*(alpha_grad+delta_Sh)+(E_sf/B_sf)*np.arctan(B_sf*(alpha+delta_Sh))
 
 def Fy(alpha):
     return D_sf*np.sin(C_sf*np.arctan(B_sf*phi_sf(alpha)))+delta_Sv
 
-print ("Fy=",round(Fy(alpha),2),"N")
+print ("Fy=",round(Fy(alpha_grad),2),"N bei Alpha: ", alpha_grad,"°")
 
 #Brake Force
 D_bf=a1_Fx*Fz**2+a2_Fx*Fz #peak factor
@@ -68,35 +70,44 @@ C_bf=1.65 #shape factor
 B_bf=(a3_Fx*Fz**2+a4_Fx*Fz)/(C_bf*D_bf*np.e**(a5_Fx*Fz)) #stiffness factor
 E_bf=a6_Fx*Fz**2+a7_Fx*Fz+a8_Fx #curvature factor
 
-def phi_bf(alpha):
-    return (1-E_bf)*alpha+(E_bf/B_bf)*np.atan(B_bf*alpha)
-def Fx(alpha):
-    return D_bf*np.sin(C_bf*np.atan(B_bf*phi_bf(alpha)))
-print ("Fx=",round(Fx(alpha),2),"N")
+def phi_bf(kappa):
+    return (1-E_bf)*kappa+(E_bf/B_bf)*np.atan(B_bf*kappa)*180/np.pi
+def Fx(kappa):
+    return D_bf*np.sin(C_bf*np.atan(B_bf*phi_bf(kappa)))
+#print ("Fx=",round(Fx(alpha_grad),2),"N bei Alpha: ", alpha_grad, "°")
 
 #Sigma definieren
 def Sigma_x(kappa):
     return -kappa/(1+kappa)
 
+print ("Sigma_x:", Sigma_x(1))
+
 def Sigma_y(kappa):
     return -np.tan(alpha)/(1+kappa)
+
+print ("Sigma_y:", Sigma_y(1))
 
 def Sigma(kappa):
     return np.sqrt(Sigma_x(kappa)**2+Sigma_y(kappa)**2)
 
 
 #Funktionen Fx und Fy definieren
-def Fx0(kappa):
-    return -Fx(alpha)*Sigma(kappa)/Sigma_x(kappa)
+def Fx_new(kappa):
+    return -(Sigma_x(kappa)/Sigma(kappa))*Fx(kappa)
 
-def Fy0(kappa):
-    return -Fy(alpha)*Sigma(kappa)/Sigma_y(kappa)
+def Fy_new(kappa):
+    return -(Sigma_y(kappa)/Sigma(kappa))*Fy(alpha)
 
 #Kappa als Laufvariable
-kappa=np.linspace(0,1,1000)
+
+#alpha=np.linspace(-20,20,100)
 
 #Diagramm plotten
-plt.plot(kappa, Fx0(kappa), label='Fx0')
-plt.plot(kappa, Fy0(kappa), label='Fy0')
+plt.plot(kappa*100, Fx_new(kappa), label='Fx')
+plt.plot(kappa*100, Fy_new(kappa), label='Fy')
+
+#plt.plot(alpha, Fy(alpha), label='Fy_grad')
+#plt.plot(alpha, Fx(alpha), label='Fx_grad')
 plt.legend(loc='best')
 plt.show()
+
