@@ -4,6 +4,34 @@ import scipy
 from scipy import constants
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+#argparse
+
+import argparse
+
+def parse_config(file_path):
+    variables = {}
+    with open(file_path, "r") as file:
+        for line in file:
+            key, value = line.strip().split("=")
+            variables[key] = eval(value)  # Vorsicht: eval kann unsicher sein!
+    return variables
+
+def main():
+    parser = argparse.ArgumentParser(description="Lade Variablen aus einer Datei.")
+    parser.add_argument("config_file", type=str, help="Pfad zur Konfigurationsdatei (.txt)")
+    
+    args = parser.parse_args()
+    
+    config = parse_config(args.config_file)
+    
+    print("Geladene Variablen:")
+    for key, value in config.items():
+        print(f"{key}: {value}")
+
+if __name__ == "__main__":
+    main()
 
 #input
 mass_vehicle=2000 #mass of vehicle in kilogram
